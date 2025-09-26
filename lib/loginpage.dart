@@ -102,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                       child: Text(
-                        _masked, // ✅ masqué en ••••••
+                        _masked, // masqué en ••••••
                         style: const TextStyle(fontSize: 22, letterSpacing: 6),
                       ),
                     ),
@@ -142,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                     _buildKeypadRow(["1", "2", "3"]),
                     _buildKeypadRow(["4", "5", "6"]),
                     _buildKeypadRow(["7", "8", "9"]),
-                    // ✅ dernière rangée : "Code oublié ?" | 0 centré | backspace
+                    // dernière rangée : "Code oublié ?" | 0 centré | backspace
                     Row(
                       children: [
                         Expanded(

@@ -46,15 +46,15 @@ class _RechargePageState extends State<RechargePage> {
     return;
   }
 
-  // ✅ Met à jour le crédit via Provider
+  // Met à jour le crédit via Provider
   Provider.of<CreditProvider>(context, listen: false).addCredit(_amountValue!);
 
-  // ✅ Message confirmation
+  // Message confirmation
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(content: Text("Recharge de $_amount CFA effectuée ✅")),
   );
 
-  setState(() => _amount = ""); // ✅ reset champ montant
+  setState(() => _amount = ""); // reset champ montant
 }
 
 
@@ -141,7 +141,7 @@ class _RechargePageState extends State<RechargePage> {
                 style: TextStyle(fontSize: 18, color: Colors.white)),
           ),
 
-          const Spacer(), // 🔹 pousse le pavé tout en bas
+          const Spacer(), // pousse le pavé tout en bas
 
           // Pavé numérique
           Container(

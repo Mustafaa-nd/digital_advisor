@@ -157,7 +157,7 @@ class OffersList extends StatelessWidget {
                     // Débiter le crédit
                     creditProvider.spendCredit(priceValue, "Achat ${offer.title}");
 
-                    // 🔹 Ajouter les ressources selon le type d'offre
+                    // Ajouter les ressources selon le type d'offre
                     if (offer.title.contains("min")) {
                       // Extrait le nombre de minutes
                       final minutes = int.tryParse(RegExp(r'\d+').firstMatch(offer.title)?.group(0) ?? '0') ?? 0;

@@ -11,7 +11,7 @@ class Offer {
 }
 
 
-// 🔹 Offres Appel
+// Offres Appel
 final appelOffers = {
   "Jour": [
     Offer(title: "Appel 30 min", subtitle: "Durée de validité 24 h", price: "100F CFA"),
@@ -30,7 +30,7 @@ final appelOffers = {
   ],
 };
 
-// 🔹 Offres Internet
+// Offres Internet
 final internetOffers = {
   "Jour": [
     Offer(title: "Pass 300 Mo", subtitle: "Durée de validité 24 h", price: "250F CFA"),
@@ -48,7 +48,7 @@ final internetOffers = {
   ],
 };
 
-// 🔹 Offres Illimax
+// Offres Illimax
 final illimaxOffers = {
   "Jour": [
     Offer(title: "Illimax 60 min • 20 sms • 100 Mo", subtitle: "Durée de validité 24 h", price: "300F CFA"),

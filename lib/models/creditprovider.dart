@@ -4,12 +4,12 @@ class CreditProvider extends ChangeNotifier {
   int _credit = 0;
   bool _isHidden = true;
 
-  // 🔹 Ressources
+  // Ressources
   int _minutes = 130;       // Minutes d'appel initiales
   double _internet = 0.13;  // Volume Internet en Go
   int _sms = 200;           // SMS disponibles
 
-  // 🔹 Historique sous forme de liste de Map
+  // Historique sous forme de liste de Map
   final List<Map<String, dynamic>> _history = [];
 
   // ====== Getters ======

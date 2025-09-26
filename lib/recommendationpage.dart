@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'models/creditprovider.dart';
 import 'models/offer.dart';
+import 'offrespage.dart';
+
 
 class RecommendationPage extends StatelessWidget {
   const RecommendationPage({super.key});
@@ -18,8 +20,8 @@ class RecommendationPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "RecommendationPage",
-          style: TextStyle(color: Colors.black),
+          "NEWO Digital Advisor",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -29,29 +31,30 @@ class RecommendationPage extends StatelessWidget {
           children: [
             const Center(
               child: Text(
-                "NEWO\nDIGITAL ADVISOR",
+                "Mon conseiller",  
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            // 🔹 Message dynamique
+
+            // Message dynamique
             Consumer<CreditProvider>(
               builder: (context, creditProvider, child) {
                 final lowMinutes = creditProvider.minutes < 100;
                 final lowInternet = creditProvider.internet < 1;
-                final lowSms = creditProvider.sms < 50;
+                final lowSms = creditProvider.sms < 30;
 
                 String message;
                 if (!lowMinutes && !lowInternet && !lowSms) {
                   message =
-                      "Toutes vos ressources sont suffisantes ! Voici vos niveaux actuels:";
+                      "Tes ressources sont suffisantes, penses à recharger ! Voici tes niveaux actuels:";
                 } else {
                   message =
                       "Ma mission est de te recommander les offres qui répondent le mieux à tes besoins:";
@@ -85,7 +88,7 @@ class RecommendationPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 🔹 Stats dynamiques
+            // Stats dynamiques
             Consumer<CreditProvider>(
               builder: (context, creditProvider, child) {
                 return Row(
@@ -113,7 +116,7 @@ class RecommendationPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 🔹 Offres recommandées dynamiques avec possibilité d'achat
+            // Offres recommandées dynamiques avec possibilité d'achat
             Consumer<CreditProvider>(
               builder: (context, creditProvider, child) {
                 final lowMinutes = creditProvider.minutes < 100;
@@ -167,9 +170,16 @@ class RecommendationPage extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextButton(
-                  onPressed: () {},
-                  child: const Text("Voir tous les offres →",
-                      style: TextStyle(color: Colors.blue)),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const OffresPage()),
+                    );
+                  },
+                  child: const Text(
+                    "Voir tous les offres →",
+                    style: TextStyle(color: Colors.blue),
+                  ),
                 ),
               ],
             ),
@@ -202,7 +212,7 @@ class RecommendationPage extends StatelessWidget {
     );
   }
 
-  // 🔹 Build offer avec possibilité d'achat
+  // Build offer avec possibilité d'achat
   Widget _buildOfferCard(Offer offer, BuildContext context) {
     final creditProvider = Provider.of<CreditProvider>(context, listen: false);
     final priceValue = int.tryParse(offer.price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
@@ -224,7 +234,7 @@ class RecommendationPage extends StatelessWidget {
                   if (creditProvider.credit >= priceValue) {
                     creditProvider.spendCredit(priceValue, "Achat ${offer.title}");
 
-                    // 🔹 Ajouter les ressources selon le type d'offre
+                    //  Ajouter les ressources selon le type d'offre
                     if (offer.title.contains("min")) {
                       final minutes = int.tryParse(RegExp(r'\d+').firstMatch(offer.title)?.group(0) ?? '0') ?? 0;
                       creditProvider.addMinutes(minutes);

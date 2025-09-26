@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'models/creditprovider.dart'; // 🔹 on importe ton provider
+import 'models/creditprovider.dart'; 
 import 'recommendationpage.dart';
 import 'rechargepage.dart';
 import 'transfertpage.dart';
@@ -35,7 +35,7 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // 🔹 Carte principale (crédit)
+            // Carte principale (crédit)
             _buildCreditCard(),
 
             const SizedBox(height: 16),
@@ -53,7 +53,7 @@ class HomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => const RecommendationPage()),
                 );
               },
-              child: const Text("Recommendation",
+              child: const Text("Mon conseiller",
                   style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
 
@@ -86,7 +86,7 @@ class HomePage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 🔹 Historique dynamique
+            // Historique dynamique
             _buildHistoryList(),
           ],
         ),
@@ -116,7 +116,7 @@ class HomePage extends StatelessWidget {
         ),
         const SizedBox(height: 10),
 
-        // 🔹 Crédit dynamique + œil
+        // Crédit dynamique + œil
         Consumer<CreditProvider>(
           builder: (context, creditProvider, child) {
             return Row(
@@ -146,7 +146,7 @@ class HomePage extends StatelessWidget {
 
         const SizedBox(height: 20),
 
-        // 🔹 Ressources dynamiques
+        // Ressources dynamiques
         Consumer<CreditProvider>(
           builder: (context, creditProvider, child) {
             return Row(
@@ -239,7 +239,7 @@ class HomePage extends StatelessWidget {
               ),
               const Divider(),
 
-              // 🔹 Si pas d’historique
+              // Si pas d’historique
               if (history.isEmpty)
                 const Center(
                   child: Padding(
@@ -248,7 +248,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
 
-              // 🔹 Sinon on affiche la liste
+              // Sinon on affiche la liste
               for (var t in history)
                 Column(
                   children: [
