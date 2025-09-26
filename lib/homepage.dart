@@ -107,13 +107,18 @@ class HomePage extends StatelessWidget {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            Text("Crédit principal", style: TextStyle(fontWeight: FontWeight.bold)),
-            Text("NEWO",
-                style: TextStyle(
-                    fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue)),
+          children: [
+            const Text(
+              "Crédit principal",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Image.asset(
+              'assets/logo.png', 
+              height: 50,        
+            ),
           ],
         ),
+
         const SizedBox(height: 10),
 
         // Crédit dynamique + œil

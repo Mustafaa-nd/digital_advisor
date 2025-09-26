@@ -56,13 +56,10 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 32),
 
             // Logo
-            const Text(
-              "NEWO",
-              style: TextStyle(fontSize: 36, fontWeight: FontWeight.w900),
-            ),
-            const Text(
-              "DIGITAL ADVISOR",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            // Logo (remplace le texte)
+            Image.asset(
+              'assets/logo.png', // chemin vers ton logo
+              height: 80,        // ajuste la taille selon ton besoin
             ),
 
             const SizedBox(height: 32),
