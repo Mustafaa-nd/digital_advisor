@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'models/creditprovider.dart'; 
+import 'models/creditprovider.dart';
+import 'models/themeprovider.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -10,7 +11,7 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  String _filter = "Tout"; // Filtre par défaut
+  String _filter = "Tout";
   TextEditingController _searchController = TextEditingController();
   String _searchText = "";
 
@@ -32,43 +33,52 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDark;
+
+    final bgColor = Theme.of(context).scaffoldBackgroundColor;
+    final appBarColor =
+        Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).primaryColor;
+    final cardColor = Theme.of(context).cardColor;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final hintColor =
+        Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7) ?? Colors.grey;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Historique complet"),
-        backgroundColor: const Color(0xFFD2B48C),
+        title: const Text("Historique"),
+        backgroundColor: appBarColor,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              isDark ? Icons.wb_sunny : Icons.nights_stay,
+              color: Colors.white,
+            ),
+            onPressed: () => themeProvider.toggleTheme(),
+          ),
+        ],
       ),
-      backgroundColor: const Color.fromARGB(255, 242, 233, 216),
+      backgroundColor: bgColor,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Consumer<CreditProvider>(
           builder: (context, creditProvider, child) {
+            // Toujours partir de la liste complète
+            List<Map<String, dynamic>> filteredHistory = creditProvider.history;
+
             // Filtrage par type
-            var history = _filter == "Tout"
-                ? creditProvider.history
-                : creditProvider.history
-                    .where((t) => _filter == "Crédit"
-                        ? t["positive"] == true
-                        : t["positive"] == false)
-                    .toList();
+            if (_filter != "Tout") {
+              filteredHistory = filteredHistory.where((t) =>
+                  _filter == "Crédit" ? t["positive"] == true : t["positive"] == false).toList();
+            }
 
             // Filtrage par recherche
             if (_searchText.isNotEmpty) {
-              history = history
-                  .where((t) => t["title"]
-                      .toString()
-                      .toLowerCase()
-                      .contains(_searchText.toLowerCase()))
+              filteredHistory = filteredHistory
+                  .where((t) =>
+                      t["title"].toString().toLowerCase().contains(_searchText.toLowerCase()))
                   .toList();
-            }
-
-            if (history.isEmpty) {
-              return const Center(
-                child: Text(
-                  "Aucune transaction pour le moment",
-                  style: TextStyle(fontSize: 16),
-                ),
-              );
             }
 
             return Column(
@@ -78,14 +88,22 @@ class _HistoryPageState extends State<HistoryPage> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     hintText: "Rechercher une transaction...",
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
-                    ),
-                    fillColor: Colors.white,
+                    hintStyle: TextStyle(color: hintColor),
+                    prefixIcon: Icon(Icons.search, color: hintColor),
                     filled: true,
+                    fillColor: cardColor.withOpacity(0.1),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide:
+                          BorderSide(color: textColor.withOpacity(0.4), width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor, width: 2),
+                    ),
                   ),
+                  style: TextStyle(color: textColor),
                 ),
                 const SizedBox(height: 10),
 
@@ -93,7 +111,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    const Text("Filtre : "),
+                    Text("Filtre : ", style: TextStyle(color: textColor)),
                     DropdownButton<String>(
                       value: _filter,
                       items: const [
@@ -111,51 +129,66 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
                 const SizedBox(height: 10),
 
-                // Liste filtrée
+                // Liste filtrée ou message "Aucune transaction"
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: history.length,
-                    itemBuilder: (context, index) {
-                      final t = history[index];
-                      return Card(
-                        color: const Color.fromARGB(255, 238, 217, 191),
-                        elevation: 3,
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
-                          title: Text(
-                            t["title"],
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16),
+                  child: filteredHistory.isEmpty
+                      ? Center(
+                          child: Text(
+                            "Aucune correspondance trouvée",
+                            style: TextStyle(fontSize: 16, color: textColor),
                           ),
-                          subtitle: Text(t["subtitle"]),
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                t["amount"],
-                                style: TextStyle(
-                                    color: t["positive"]
-                                        ? Colors.green
-                                        : Colors.red,
-                                    fontWeight: FontWeight.bold),
+                        )
+                      : ListView.builder(
+                          itemCount: filteredHistory.length,
+                          itemBuilder: (context, index) {
+                            final t = filteredHistory[index];
+                            return Card(
+                              color: cardColor,
+                              elevation: 3,
+                              margin: const EdgeInsets.symmetric(vertical: 6),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                t["date"],
-                                style: const TextStyle(fontSize: 12),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                title: Text(
+                                  t["title"],
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: textColor),
+                                ),
+                                subtitle: Text(
+                                  t["subtitle"],
+                                  style:
+                                      TextStyle(color: textColor.withOpacity(0.7)),
+                                ),
+                                trailing: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      t["amount"],
+                                      style: TextStyle(
+                                          color: t["positive"]
+                                              ? Colors.green
+                                              : Colors.red,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      t["date"],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: textColor.withOpacity(0.7)),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
                 ),
               ],
             );

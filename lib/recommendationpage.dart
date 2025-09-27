@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'models/creditprovider.dart';
 import 'models/offer.dart';
+import 'models/themeprovider.dart';
 import 'offrespage.dart';
 
 
@@ -10,39 +11,54 @@ class RecommendationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5E6CC),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFD2B48C),
+        backgroundColor: theme.primaryColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back,
+              color: theme.appBarTheme.foregroundColor ?? Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           "NEWO Digital Advisor",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: theme.appBarTheme.foregroundColor ?? Colors.black),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              themeProvider.isDark ? Icons.wb_sunny : Icons.nights_stay,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              themeProvider.toggleTheme();
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
+            Center(
               child: Text(
-                "Mon conseiller",  
+                "Mon conseiller",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,
-                  color: Colors.blue,
+                  color: theme.primaryColor,
                   fontWeight: FontWeight.w700,
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
-
 
             // Message dynamique
             Consumer<CreditProvider>(
@@ -66,12 +82,13 @@ class RecommendationPage extends StatelessWidget {
                     Text.rich(
                       TextSpan(
                         text: "Salut Mouhamadou, bienvenu chez ton conseiller ",
-                        style: const TextStyle(fontSize: 14),
-                        children: const [
+                        style: TextStyle(fontSize: 14, color: theme.textTheme.bodyMedium?.color),
+                        children: [
                           TextSpan(
                             text: "NeWo.",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.blue),
+                                fontWeight: FontWeight.bold,
+                                color: theme.primaryColor),
                           ),
                         ],
                       ),
@@ -79,13 +96,12 @@ class RecommendationPage extends StatelessWidget {
                     const SizedBox(height: 10),
                     Text(
                       message,
-                      style: const TextStyle(fontSize: 14),
+                      style: TextStyle(fontSize: 14, color: theme.textTheme.bodyMedium?.color),
                     ),
                   ],
                 );
               },
             ),
-
             const SizedBox(height: 20),
 
             // Stats dynamiques
@@ -97,17 +113,26 @@ class RecommendationPage extends StatelessWidget {
                     _buildStat(
                       Icons.phone,
                       "${creditProvider.minutes} MIN",
-                      creditProvider.minutes < 100 ? Colors.red : Colors.black,
+                      creditProvider.minutes < 100
+                          ? (themeProvider.isDark ? Colors.red.shade200 : Colors.red)
+                          : theme.textTheme.bodyLarge?.color ?? Colors.black,
+                      theme,
                     ),
                     _buildStat(
                       Icons.wifi,
                       "${creditProvider.internet.toStringAsFixed(2)} GO",
-                      creditProvider.internet < 1 ? Colors.redAccent : Colors.black,
+                      creditProvider.internet < 1
+                          ? (themeProvider.isDark ? Colors.red.shade200 : Colors.redAccent)
+                          : theme.textTheme.bodyLarge?.color ?? Colors.black,
+                      theme,
                     ),
                     _buildStat(
                       Icons.message,
                       "${creditProvider.sms} SMS",
-                      creditProvider.sms < 50 ? Colors.red : Colors.black,
+                      creditProvider.sms < 50
+                          ? (themeProvider.isDark ? Colors.red.shade200 : Colors.red)
+                          : theme.textTheme.bodyLarge?.color ?? Colors.black,
+                      theme,
                     ),
                   ],
                 );
@@ -133,47 +158,44 @@ class RecommendationPage extends StatelessWidget {
                   final illimaxRecs = illimaxOffers.values.expand((list) => list).take(2);
 
                   if (appelRecs.isNotEmpty) {
-                    offerWidgets.add(_buildCategoryTitle("Appel"));
-                    offerWidgets.addAll(appelRecs.map((offer) => _buildOfferCard(offer, context)));
+                    offerWidgets.add(_buildCategoryTitle("Appel", theme));
+                    offerWidgets.addAll(appelRecs.map((offer) => _buildOfferCard(offer, context, theme)));
                   }
                   if (internetRecs.isNotEmpty) {
-                    offerWidgets.add(_buildCategoryTitle("Internet"));
-                    offerWidgets.addAll(internetRecs.map((offer) => _buildOfferCard(offer, context)));
+                    offerWidgets.add(_buildCategoryTitle("Internet", theme));
+                    offerWidgets.addAll(internetRecs.map((offer) => _buildOfferCard(offer, context, theme)));
                   }
                   if (illimaxRecs.isNotEmpty) {
-                    offerWidgets.add(_buildCategoryTitle("Illimax"));
-                    offerWidgets.addAll(illimaxRecs.map((offer) => _buildOfferCard(offer, context)));
+                    offerWidgets.add(_buildCategoryTitle("Illimax", theme));
+                    offerWidgets.addAll(illimaxRecs.map((offer) => _buildOfferCard(offer, context, theme)));
                   }
                 } else if (lowMinutes && !lowInternet && !lowSms) {
-                  offerWidgets.add(_buildCategoryTitle("Appel"));
+                  offerWidgets.add(_buildCategoryTitle("Appel", theme));
                   offerWidgets.addAll([
                     ...appelOffers["Jour"]!,
                     ...appelOffers["Semaine"]!,
                     ...appelOffers["Mois"]!,
-                  ].map((offer) => _buildOfferCard(offer, context)));
+                  ].map((offer) => _buildOfferCard(offer, context, theme)));
                 } else if (lowInternet && !lowMinutes && !lowSms) {
-                  offerWidgets.add(_buildCategoryTitle("Internet"));
+                  offerWidgets.add(_buildCategoryTitle("Internet", theme));
                   offerWidgets.addAll([
                     ...internetOffers["Jour"]!,
                     ...internetOffers["Semaine"]!,
                     ...internetOffers["Mois"]!,
-                  ].map((offer) => _buildOfferCard(offer, context)));
+                  ].map((offer) => _buildOfferCard(offer, context, theme)));
                 } else if ((lowMinutes && lowInternet) ||
                     (lowMinutes && lowInternet && lowSms) ||
                     (lowInternet && lowSms) ||
                     (lowMinutes && lowSms)) {
-                  offerWidgets.add(_buildCategoryTitle("Illimax"));
+                  offerWidgets.add(_buildCategoryTitle("Illimax", theme));
                   offerWidgets.addAll([
                     ...illimaxOffers["Jour"]!,
                     ...illimaxOffers["Semaine"]!,
                     ...illimaxOffers["Mois"]!,
-                  ].map((offer) => _buildOfferCard(offer, context)));
+                  ].map((offer) => _buildOfferCard(offer, context, theme)));
                 }
 
-                if (offerWidgets.isEmpty) {
-                  return const SizedBox.shrink();
-                }
-
+                if (offerWidgets.isEmpty) return const SizedBox.shrink();
                 return Column(children: offerWidgets);
               },
             ),
@@ -183,9 +205,11 @@ class RecommendationPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   "Et si tu préfères, ",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: theme.textTheme.bodyMedium?.color),
                 ),
                 TextButton(
                   onPressed: () {
@@ -194,9 +218,9 @@ class RecommendationPage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => const OffresPage()),
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     "Voir tous les offres →",
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(color: theme.primaryColor),
                   ),
                 ),
               ],
@@ -208,53 +232,53 @@ class RecommendationPage extends StatelessWidget {
   }
 
   // ===== Widgets réutilisables =====
-
-  Widget _buildCategoryTitle(String title) {
+  Widget _buildCategoryTitle(String title, ThemeData theme) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color.fromARGB(255, 205, 170, 124), width: 1.5),
+        border: Border.all(
+            color: theme.primaryColor.withOpacity(0.7), width: 1.5),
         borderRadius: BorderRadius.circular(12),
-        color: const Color.fromARGB(255, 250, 231, 205).withOpacity(0.1), // léger fond beige
+        color: theme.cardColor.withOpacity(0.1),
       ),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: Color.fromARGB(255, 0, 0, 0), // texte beige
+          color: theme.textTheme.bodyLarge?.color,
         ),
       ),
     );
   }
 
-
-
-  static Widget _buildStat(IconData icon, String value, Color color) {
+  static Widget _buildStat(IconData icon, String value, Color color, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-              color: Colors.grey.shade300, blurRadius: 5, offset: const Offset(2, 2))
+              color: theme.brightness == Brightness.dark
+                  ? Colors.black45
+                  : Colors.grey.shade300,
+              blurRadius: 5,
+              offset: const Offset(2, 2))
         ],
       ),
       child: Column(
         children: [
           Icon(icon, size: 28, color: color),
           const SizedBox(height: 6),
-          Text(value,
-              style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+          Text(value, style: TextStyle(fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );
   }
 
-  // Build offer avec possibilité d'achat
-  Widget _buildOfferCard(Offer offer, BuildContext context) {
+  Widget _buildOfferCard(Offer offer, BuildContext context, ThemeData theme) {
     final creditProvider = Provider.of<CreditProvider>(context, listen: false);
     final priceValue = int.tryParse(offer.price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
 
@@ -315,10 +339,15 @@ class RecommendationPage extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
-            BoxShadow(color: Colors.grey.shade300, blurRadius: 5, offset: const Offset(2, 2))
+            BoxShadow(
+                color: theme.brightness == Brightness.dark
+                    ? Colors.black45
+                    : Colors.grey.shade300,
+                blurRadius: 5,
+                offset: const Offset(2, 2))
           ],
         ),
         child: Row(
@@ -327,11 +356,20 @@ class RecommendationPage extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(offer.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(offer.subtitle, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                Text(offer.title,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: theme.textTheme.bodyLarge?.color)),
+                Text(offer.subtitle,
+                    style: TextStyle(
+                        fontSize: 12, color: theme.textTheme.bodyMedium?.color)),
               ],
             ),
-            Text(offer.price, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blue)),
+            Text(offer.price,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: theme.primaryColor)),
           ],
         ),
       ),

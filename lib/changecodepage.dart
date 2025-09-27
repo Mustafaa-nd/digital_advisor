@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'models/themeprovider.dart';
 
 class ChangeCodePage extends StatefulWidget {
   const ChangeCodePage({super.key});
@@ -14,23 +16,10 @@ class _ChangeCodePageState extends State<ChangeCodePage> {
   final _newCodeController = TextEditingController();
   final _confirmCodeController = TextEditingController();
 
-  static const Color kBg = Color(0xFFD2B48C);   // beige clair
-  static const Color kCard = Color(0xFFB88646); // beige foncé
-  static const Color kPrimary = Colors.blue;
-
-  // 🔹 Numéro fixe
   final String fixedPhoneNumber = "766247834";
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _phoneController.text = fixedPhoneNumber; // Remplissage automatique
-  // }
 
   void _changeCode() async {
     if (_formKey.currentState!.validate()) {
-
-      // 🔹 Vérification que le numéro correspond
       if (_phoneController.text.trim() != fixedPhoneNumber) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Numéro invalide")),
@@ -56,13 +45,31 @@ class _ChangeCodePageState extends State<ChangeCodePage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    // ⚡ Couleurs depuis le thème
+    final kBg = Theme.of(context).scaffoldBackgroundColor;
+    final kCard = Theme.of(context).cardColor;
+    final kPrimary = Theme.of(context).primaryColor;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final iconColor = Theme.of(context).iconTheme.color ?? Colors.black;
+
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
         title: const Text("Réinitialiser le code"),
-        backgroundColor: kCard,
+        backgroundColor: kPrimary,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              themeProvider.isDark ? Icons.wb_sunny : Icons.nights_stay,
+              color: Colors.white,
+            ),
+            onPressed: () => themeProvider.toggleTheme(),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -71,14 +78,14 @@ class _ChangeCodePageState extends State<ChangeCodePage> {
             children: [
               Image.asset('assets/logo.png', height: 80),
               const SizedBox(height: 16),
-              const Icon(Icons.lock_reset, size: 90, color: Colors.white70),
+              Icon(Icons.lock_reset, size: 90, color: iconColor),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "Réinitialisation du code",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black87,
+                  color: textColor,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -105,10 +112,13 @@ class _ChangeCodePageState extends State<ChangeCodePage> {
                         label: "Numéro de téléphone",
                         icon: Icons.phone,
                         keyboardType: TextInputType.phone,
-                        enabled: true, // ⚡ utilisateur ne peut pas modifier
-                        validator: (v) => v == null || v.isEmpty
-                            ? "Numéro manquant"
-                            : null,
+                        enabled: true,
+                        validator: (v) =>
+                            v == null || v.isEmpty ? "Numéro manquant" : null,
+                        textColor: textColor,
+                        fillColor: kCard.withOpacity(0.1),
+                        borderColor: textColor.withOpacity(0.5),
+                        focusedBorderColor: kPrimary,
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
@@ -123,6 +133,10 @@ class _ChangeCodePageState extends State<ChangeCodePage> {
                           if (v.length < 6) return "Min. 6 caractères";
                           return null;
                         },
+                        textColor: textColor,
+                        fillColor: kCard.withOpacity(0.1),
+                        borderColor: textColor.withOpacity(0.5),
+                        focusedBorderColor: kPrimary,
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
@@ -131,9 +145,11 @@ class _ChangeCodePageState extends State<ChangeCodePage> {
                         icon: Icons.lock_outline,
                         isPassword: true,
                         validator: (v) =>
-                            v != _newCodeController.text
-                                ? "Les codes ne correspondent pas"
-                                : null,
+                            v != _newCodeController.text ? "Les codes ne correspondent pas" : null,
+                        textColor: textColor,
+                        fillColor: kCard.withOpacity(0.1),
+                        borderColor: textColor.withOpacity(0.5),
+                        focusedBorderColor: kPrimary,
                       ),
                       const SizedBox(height: 24),
                       SizedBox(
@@ -174,8 +190,12 @@ class _ChangeCodePageState extends State<ChangeCodePage> {
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
     bool isPassword = false,
-    bool enabled = true, // champ activable/désactivable
+    bool enabled = true,
     String? Function(String?)? validator,
+    required Color textColor,
+    required Color fillColor,
+    required Color borderColor,
+    required Color focusedBorderColor,
   }) {
     return TextFormField(
       controller: controller,
@@ -183,20 +203,20 @@ class _ChangeCodePageState extends State<ChangeCodePage> {
       obscureText: isPassword,
       enabled: enabled,
       validator: validator,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: textColor),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.white70),
+        labelStyle: TextStyle(color: textColor.withOpacity(0.7)),
+        prefixIcon: Icon(icon, color: textColor.withOpacity(0.7)),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.1),
+        fillColor: fillColor,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.white54),
+          borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blue, width: 2),
+          borderSide: BorderSide(color: focusedBorderColor, width: 2),
         ),
       ),
     );

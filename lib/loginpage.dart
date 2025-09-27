@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'homepage.dart'; 
+import 'package:provider/provider.dart';
+import 'homepage.dart';
 import 'changecodepage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
+import 'models/themeprovider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,14 +13,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  static const Color kBg = Color(0xFFD2B48C);     // beige clair
-  static const Color kPad = Color(0xFFB88646);    // beige + foncé pour le pavé
-  static const double keyW = 72;                  // largeur d'une touche
-  static const double keyH = 56;                  // hauteur d'une touche
-
   String _input = "";
+  static const double keyW = 72;
+  static const double keyH = 56;
 
-  String get _masked => List.filled(_input.length, '•').join(); // ••••••
+  String get _masked => List.filled(_input.length, '•').join();
 
   void _onNumberPressed(String number) {
     setState(() {
@@ -30,44 +27,62 @@ class _LoginPageState extends State<LoginPage> {
 
   void _onBackspace() {
     setState(() {
-      if (_input.isNotEmpty) {
-        _input = _input.substring(0, _input.length - 1);
-      }
+      if (_input.isNotEmpty) _input = _input.substring(0, _input.length - 1);
     });
   }
 
-void _onValidate() async {
-  if (_input.length != 6) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Code incomplet")),
-    );
-    return;
+  void _onValidate() async {
+    if (_input.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Code incomplet")),
+      );
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final storedPin = prefs.getString('userPin') ?? "123456";
+
+    if (_input == storedPin) {
+      await prefs.setBool('isLoggedIn', true);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Code incorrect")),
+      );
+    }
   }
-
-  final prefs = await SharedPreferences.getInstance();
-  final storedPin = prefs.getString('userPin') ?? "123456"; // valeur par défaut
-
-  if (_input == storedPin) {
-    // 🔹 Sauvegarde que l'utilisateur est connecté
-    await prefs.setBool('isLoggedIn', true);
-
-    // 🔹 Redirige vers HomePage
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomePage()),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Code incorrect")),
-    );
-  }
-}
-
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    final bgColor = Theme.of(context).scaffoldBackgroundColor;
+    final padColor = Theme.of(context).cardColor;
+    final primaryColor = Theme.of(context).primaryColor;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+
     return Scaffold(
-      backgroundColor: kBg,
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: primaryColor,
+        elevation: 0,
+        title: const Text("Connexion"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              themeProvider.isDark ? Icons.wb_sunny : Icons.nights_stay,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              themeProvider.toggleTheme();
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,22 +90,18 @@ void _onValidate() async {
             const SizedBox(height: 32),
 
             // Logo
-            // Logo (remplace le texte)
-            Image.asset(
-              'assets/logo.png', // chemin vers ton logo
-              height: 80,        // ajuste la taille selon ton besoin
-            ),
+            Image.asset('assets/logo.png', height: 80),
 
             const SizedBox(height: 32),
 
             // Label
-            const Padding(
-              padding: EdgeInsets.only(left: 40, bottom: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 40, bottom: 8),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Code de connexion",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
                 ),
               ),
             ),
@@ -106,20 +117,20 @@ void _onValidate() async {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       alignment: Alignment.centerLeft,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: padColor.withOpacity(0.8),
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.blue, width: 1.6),
+                        border: Border.all(color: primaryColor, width: 1.6),
                         boxShadow: const [
                           BoxShadow(
-                            color: Colors.black12,
+                            color: Color.fromARGB(31, 243, 243, 243),
                             blurRadius: 3,
                             offset: Offset(1, 2),
                           )
                         ],
                       ),
                       child: Text(
-                        _masked, // masqué en ••••••
-                        style: const TextStyle(fontSize: 22, letterSpacing: 6),
+                        _masked,
+                        style: TextStyle(fontSize: 22, letterSpacing: 6, color: textColor),
                       ),
                     ),
                   ),
@@ -129,8 +140,8 @@ void _onValidate() async {
                     child: Container(
                       width: 52,
                       height: 52,
-                      decoration: const BoxDecoration(
-                        color: Colors.blue,
+                      decoration: BoxDecoration(
+                        color: primaryColor,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.arrow_forward, color: Colors.white),
@@ -144,21 +155,22 @@ void _onValidate() async {
 
             // Pavé numérique
             SizedBox(
-              height: 330, // 🔹 hauteur fixe (ajuste selon ton design Figma)
+              height: 330,
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 28),
                 padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 decoration: BoxDecoration(
-                  color: kPad,
+                  color: bgColor == Colors.white
+                      ? Colors.grey.shade200
+                      : const Color.fromARGB(255, 106, 106, 106),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start, // 🔹 commence en haut
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    _buildKeypadRow(["1", "2", "3"]),
-                    _buildKeypadRow(["4", "5", "6"]),
-                    _buildKeypadRow(["7", "8", "9"]),
-                    // dernière rangée : "Code oublié ?" | 0 centré | backspace
+                    _buildKeypadRow(["1", "2", "3"], padColor, textColor),
+                    _buildKeypadRow(["4", "5", "6"], padColor, textColor),
+                    _buildKeypadRow(["7", "8", "9"], padColor, textColor),
                     Row(
                       children: [
                         Expanded(
@@ -173,14 +185,12 @@ void _onValidate() async {
                               },
                               child: const Text(
                                 "Code oublié ?",
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Color.fromARGB(255, 24, 176, 138)),
                               ),
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: Center(child: _buildNumberButton("0")),
-                        ),
+                        Expanded(child: Center(child: _buildNumberButton("0", padColor, textColor))),
                         Expanded(
                           child: Align(
                             alignment: Alignment.centerRight,
@@ -193,9 +203,9 @@ void _onValidate() async {
                                 height: 44,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.blue, width: 2),
+                                  border: Border.all(color: primaryColor, width: 2),
                                 ),
-                                child: const Icon(Icons.arrow_back, color: Colors.blue),
+                                child: Icon(Icons.arrow_back, color: primaryColor),
                               ),
                             ),
                           ),
@@ -234,26 +244,25 @@ void _onValidate() async {
         ),
       ),
     );
+
   }
 
-  // ----------------- Widgets touches -----------------
-
-  Widget _buildKeypadRow(List<String> numbers) {
+  Widget _buildKeypadRow(List<String> numbers, Color padColor, Color textColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: numbers.map(_buildNumberButton).toList(),
+        children: numbers.map((n) => _buildNumberButton(n, padColor, textColor)).toList(),
       ),
     );
   }
 
-  Widget _buildNumberButton(String number) {
+  Widget _buildNumberButton(String number, Color padColor, Color textColor) {
     return SizedBox(
       width: keyW,
       height: keyH,
       child: Material(
-        color: Colors.grey.shade300,
+        color: padColor.withOpacity(0.8),
         elevation: 3,
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
@@ -262,7 +271,7 @@ void _onValidate() async {
           child: Center(
             child: Text(
               number,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textColor),
             ),
           ),
         ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'models/offer.dart';
 import 'package:provider/provider.dart';
 import 'models/creditprovider.dart';
-
+import 'models/themeprovider.dart';
 
 class OffresPage extends StatefulWidget {
   const OffresPage({super.key});
@@ -37,19 +37,36 @@ class _OffresPageState extends State<OffresPage>
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5E6CC),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFD2B48C),
+        backgroundColor: theme.primaryColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back,
+              color: theme.appBarTheme.foregroundColor ?? Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           "NEWO Digital Advisor",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: theme.appBarTheme.foregroundColor ?? Colors.black,
+              fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              themeProvider.isDark ? Icons.wb_sunny : Icons.nights_stay,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              themeProvider.toggleTheme();
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -59,6 +76,7 @@ class _OffresPageState extends State<OffresPage>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: List.generate(_tabs.length, (index) {
+                final isSelected = _selectedIndex == index;
                 return Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: ChoiceChip(
@@ -66,18 +84,20 @@ class _OffresPageState extends State<OffresPage>
                       _tabs[index],
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: isSelected
+                            ? theme.colorScheme.onPrimary
+                            : theme.textTheme.bodyMedium?.color,
                       ),
                     ),
-                    selected: _selectedIndex == index,
-                    selectedColor: const Color(0xFFD2B48C), // beige foncé
-                    backgroundColor: const Color(0xFFF5E6CC), // beige clair
+                    selected: isSelected,
+                    selectedColor: theme.primaryColor,
+                    backgroundColor: theme.cardColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(
-                        color: _selectedIndex == index
-                            ? Colors.blue
-                            : Colors.brown.shade200,
+                        color: isSelected
+                            ? theme.colorScheme.secondary
+                            : theme.dividerColor,
                       ),
                     ),
                     onSelected: (_) {
@@ -117,6 +137,8 @@ class OffersList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: data.entries.map((entry) {
@@ -124,10 +146,15 @@ class OffersList extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(entry.key,
-                style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: theme.textTheme.bodyLarge?.color,
+                )),
             const SizedBox(height: 8),
-            ...entry.value.map((offer) => _buildOfferCard(offer, context)).toList(),
+            ...entry.value
+                .map((offer) => _buildOfferCard(offer, context, theme))
+                .toList(),
             const SizedBox(height: 20),
           ],
         );
@@ -135,9 +162,10 @@ class OffersList extends StatelessWidget {
     );
   }
 
-  Widget _buildOfferCard(Offer offer, BuildContext context) {
+  Widget _buildOfferCard(Offer offer, BuildContext context, ThemeData theme) {
     final creditProvider = Provider.of<CreditProvider>(context, listen: false);
-    final priceValue = int.tryParse(offer.price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    final priceValue =
+        int.tryParse(offer.price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
 
     return InkWell(
       onTap: () {
@@ -148,54 +176,62 @@ class OffersList extends StatelessWidget {
             content: Text("Voulez-vous acheter ${offer.title} pour ${offer.price}?"),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context), 
-                child: const Text("Annuler")
-              ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Annuler")),
               ElevatedButton(
-                onPressed: () {
-                  if (creditProvider.credit >= priceValue) {
-                    // Débiter le crédit
-                    creditProvider.spendCredit(priceValue, "Achat ${offer.title}");
+                  onPressed: () {
+                    if (creditProvider.credit >= priceValue) {
+                      creditProvider.spendCredit(priceValue, "Achat ${offer.title}");
 
-                    // Ajouter les ressources selon le type d'offre
-                    if (offer.title.contains("min")) {
-                      // Extrait le nombre de minutes
-                      final minutes = int.tryParse(RegExp(r'\d+').firstMatch(offer.title)?.group(0) ?? '0') ?? 0;
-                      creditProvider.addMinutes(minutes);
-                    }
-                    if (offer.title.contains("Go") || offer.title.contains("Mo")) {
-                      // Extrait le volume Internet
-                      final match = RegExp(r'(\d+(?:,\d+)?)\s*(Go|Mo)').firstMatch(offer.title);
-                      if (match != null) {
-                        double value = double.parse(match.group(1)!.replaceAll(',', '.'));
-                        if (match.group(2) == 'Mo') value = value / 1024; // Convertir Mo → Go
-                        creditProvider.addInternet(value);
+                      if (offer.title.contains("min")) {
+                        final minutes = int.tryParse(
+                                RegExp(r'\d+')
+                                    .firstMatch(offer.title)
+                                    ?.group(0) ??
+                                    '0') ??
+                            0;
+                        creditProvider.addMinutes(minutes);
                       }
-                    }
-                    if (offer.title.contains("sms") || offer.title.contains("SMS")) {
-                      // Extrait le nombre de SMS
-                      final sms = int.tryParse(RegExp(r'\d+\s*(?:sms|SMS)').firstMatch(offer.title)?.group(0)?.replaceAll(RegExp(r'[^0-9]'), '') ?? '0') ?? 0;
-                      creditProvider.addSMS(sms);
-                    }
+                      if (offer.title.contains("Go") || offer.title.contains("Mo")) {
+                        final match =
+                            RegExp(r'(\d+(?:,\d+)?)\s*(Go|Mo)')
+                                .firstMatch(offer.title);
+                        if (match != null) {
+                          double value =
+                              double.parse(match.group(1)!.replaceAll(',', '.'));
+                          if (match.group(2) == 'Mo') value = value / 1024;
+                          creditProvider.addInternet(value);
+                        }
+                      }
+                      if (offer.title.contains("sms") ||
+                          offer.title.contains("SMS")) {
+                        final sms = int.tryParse(
+                                RegExp(r'\d+\s*(?:sms|SMS)')
+                                    .firstMatch(offer.title)
+                                    ?.group(0)
+                                    ?.replaceAll(RegExp(r'[^0-9]'), '') ??
+                                    '0') ??
+                            0;
+                        creditProvider.addSMS(sms);
+                      }
 
-                    Navigator.pop(context);
+                      Navigator.pop(context);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("${offer.title} acheté avec succès ✅"),
-                      ),
-                    );
-                  } else {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Crédit insuffisant pour cet achat ⚠️"),
-                      ),
-                    );
-                  }
-                },
-                child: const Text("Confirmer")
-              ),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("${offer.title} acheté avec succès ✅"),
+                        ),
+                      );
+                    } else {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Crédit insuffisant pour cet achat ⚠️"),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text("Confirmer")),
             ],
           ),
         );
@@ -204,11 +240,13 @@ class OffersList extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-                color: Colors.grey.shade300,
+                color: theme.brightness == Brightness.dark
+                    ? Colors.black45
+                    : Colors.grey.shade300,
                 blurRadius: 5,
                 offset: const Offset(2, 2))
           ],
@@ -220,18 +258,23 @@ class OffersList extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(offer.title,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: theme.textTheme.bodyLarge?.color)),
                 Text(offer.subtitle,
-                    style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: theme.textTheme.bodyMedium?.color)),
               ],
             ),
             Text(offer.price,
                 style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blue)),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color.fromARGB(255, 70, 197, 167))),
           ],
         ),
       ),
     );
   }
-
 }

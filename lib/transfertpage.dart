@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'models/creditprovider.dart';
+import 'models/themeprovider.dart';
 
 class TransfertPage extends StatefulWidget {
   const TransfertPage({super.key});
@@ -14,7 +15,7 @@ class _TransfertPageState extends State<TransfertPage> {
   String _recipient = "";
 
   int? get _amountValue =>
-      _amount.isEmpty ? null : int.tryParse(_amount); // conversion en int
+      _amount.isEmpty ? null : int.tryParse(_amount);
 
   bool get _isValidAmount {
     final value = _amountValue;
@@ -22,30 +23,24 @@ class _TransfertPageState extends State<TransfertPage> {
     return value >= 100 && value <= 500000;
   }
 
-  bool get _isValidRecipient => _recipient.length == 9; // exemple: numéro à 9 chiffres
+  bool get _isValidRecipient => _recipient.length == 9;
 
   void _onNumberPressed(String number) {
     setState(() {
-      if (_amount.length < 6) {
-        _amount += number;
-      }
+      if (_amount.length < 6) _amount += number;
     });
   }
 
   void _onBackspace() {
     setState(() {
-      if (_amount.isNotEmpty) {
-        _amount = _amount.substring(0, _amount.length - 1);
-      }
+      if (_amount.isNotEmpty) _amount = _amount.substring(0, _amount.length - 1);
     });
   }
 
   void _onTransfer() {
     if (!_isValidAmount || !_isValidRecipient) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                "Montant ou numéro bénéficiaire invalide")),
+        const SnackBar(content: Text("Montant ou numéro bénéficiaire invalide")),
       );
       return;
     }
@@ -55,9 +50,7 @@ class _TransfertPageState extends State<TransfertPage> {
         .spendCredit(_amountValue!, "Transfert vers $_recipient");
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(
-              "Transfert de $_amount CFA vers $_recipient effectué ✅")),
+      SnackBar(content: Text("Transfert de $_amount CFA vers $_recipient effectué ✅")),
     );
 
     setState(() {
@@ -66,34 +59,55 @@ class _TransfertPageState extends State<TransfertPage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5E6CC),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFD2B48C),
+        backgroundColor: theme.primaryColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.blue),
+          icon: Icon(Icons.arrow_back, color: theme.appBarTheme.foregroundColor ?? Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text("NEWO Digital Advisor",
-            style: TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.black)),
+        title: Text(
+          "NEWO Digital Advisor",
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: theme.appBarTheme.foregroundColor ?? Colors.black),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              themeProvider.isDark ? Icons.wb_sunny : Icons.nights_stay,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              themeProvider.toggleTheme();
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
           const SizedBox(height: 10),
-          // Badge "Transfert d'argent"
+          // Badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFFD2B48C),
+              color: theme.primaryColor,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Text("Transfert d'argent",
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              "Transfert d'argent",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -102,33 +116,35 @@ class _TransfertPageState extends State<TransfertPage> {
             margin: const EdgeInsets.symmetric(horizontal: 16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.grey.shade300,
-                    blurRadius: 5,
-                    offset: const Offset(2, 2))
+                  color: theme.brightness == Brightness.dark ? Colors.black45 : Colors.grey.shade300,
+                  blurRadius: 5,
+                  offset: const Offset(2, 2),
+                ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Mouhamadou Moustapha NDIAYE",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text("Mouhamadou Moustapha NDIAYE",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: theme.textTheme.bodyLarge?.color)),
                 const SizedBox(height: 5),
-                const Text("766247834",
-                    style: TextStyle(color: Colors.black54)),
+                Text("766247834",
+                    style: TextStyle(color: theme.textTheme.bodyMedium?.color)),
                 const SizedBox(height: 20),
                 TextField(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: "Numéro bénéficiaire",
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
+                    labelStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
                   ),
                   keyboardType: TextInputType.number,
                   maxLength: 9,
                   onChanged: (val) => setState(() => _recipient = val),
+                  style: TextStyle(color: theme.textTheme.bodyLarge?.color),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -136,7 +152,7 @@ class _TransfertPageState extends State<TransfertPage> {
                   style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: _isValidAmount ? Colors.black : Colors.red),
+                      color: _isValidAmount ? theme.textTheme.bodyLarge?.color : Colors.red),
                 ),
                 const Divider(),
               ],
@@ -147,18 +163,14 @@ class _TransfertPageState extends State<TransfertPage> {
 
           // Bouton Transférer
           ElevatedButton(
-            onPressed:
-                (_isValidAmount && _isValidRecipient) ? _onTransfer : null,
+            onPressed: (_isValidAmount && _isValidRecipient) ? _onTransfer : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: theme.primaryColor,
               disabledBackgroundColor: Colors.grey,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text("Transférer",
-                style: TextStyle(fontSize: 18, color: Colors.white)),
+            child: const Text("Transférer", style: TextStyle(fontSize: 18, color: Colors.white)),
           ),
 
           const Spacer(),
@@ -168,7 +180,7 @@ class _TransfertPageState extends State<TransfertPage> {
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFB88646),
+              color: theme.primaryColor.withOpacity(0.8),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -191,10 +203,9 @@ class _TransfertPageState extends State<TransfertPage> {
                             height: 44,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.blue, width: 2),
+                              border: Border.all(color:Colors.white, width: 2),
                             ),
-                            child:
-                                const Icon(Icons.arrow_back, color: Colors.blue),
+                            child: Icon(Icons.arrow_back, color:Colors.white),
                           ),
                         ),
                       ),
@@ -233,11 +244,16 @@ class _TransfertPageState extends State<TransfertPage> {
           child: Center(
             child: Text(
               number,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black, 
+              ),
             ),
           ),
         ),
       ),
     );
   }
+
 }
