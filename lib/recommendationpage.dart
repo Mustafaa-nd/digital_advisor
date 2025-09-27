@@ -54,10 +54,10 @@ class RecommendationPage extends StatelessWidget {
                 String message;
                 if (!lowMinutes && !lowInternet && !lowSms) {
                   message =
-                      "Tes ressources sont suffisantes, penses à recharger ! Voici tes niveaux actuels:";
+                      "Tes ressources sont suffisantes, profites en ! Voici tes niveaux actuels:";
                 } else {
                   message =
-                      "Ma mission est de te recommander les offres qui répondent le mieux à tes besoins:";
+                      "Tes ressources sont insuffisantes. Voici tes niveaux actuels:";
                 }
 
                 return Column(
@@ -123,40 +123,58 @@ class RecommendationPage extends StatelessWidget {
                 final lowInternet = creditProvider.internet < 1;
                 final lowSms = creditProvider.sms < 50;
 
-                List<Offer> recommendedOffers = [];
+                // Offres finales à afficher
+                List<Widget> offerWidgets = [];
 
-                if (lowMinutes && !lowInternet && !lowSms) {
-                  recommendedOffers = [
+                if (!lowMinutes && !lowInternet && !lowSms) {
+                  // Toutes ressources suffisantes : 2 offres par type
+                  final appelRecs = appelOffers.values.expand((list) => list).take(2);
+                  final internetRecs = internetOffers.values.expand((list) => list).take(2);
+                  final illimaxRecs = illimaxOffers.values.expand((list) => list).take(2);
+
+                  if (appelRecs.isNotEmpty) {
+                    offerWidgets.add(_buildCategoryTitle("Appel"));
+                    offerWidgets.addAll(appelRecs.map((offer) => _buildOfferCard(offer, context)));
+                  }
+                  if (internetRecs.isNotEmpty) {
+                    offerWidgets.add(_buildCategoryTitle("Internet"));
+                    offerWidgets.addAll(internetRecs.map((offer) => _buildOfferCard(offer, context)));
+                  }
+                  if (illimaxRecs.isNotEmpty) {
+                    offerWidgets.add(_buildCategoryTitle("Illimax"));
+                    offerWidgets.addAll(illimaxRecs.map((offer) => _buildOfferCard(offer, context)));
+                  }
+                } else if (lowMinutes && !lowInternet && !lowSms) {
+                  offerWidgets.add(_buildCategoryTitle("Appel"));
+                  offerWidgets.addAll([
                     ...appelOffers["Jour"]!,
                     ...appelOffers["Semaine"]!,
                     ...appelOffers["Mois"]!,
-                  ];
+                  ].map((offer) => _buildOfferCard(offer, context)));
                 } else if (lowInternet && !lowMinutes && !lowSms) {
-                  recommendedOffers = [
+                  offerWidgets.add(_buildCategoryTitle("Internet"));
+                  offerWidgets.addAll([
                     ...internetOffers["Jour"]!,
                     ...internetOffers["Semaine"]!,
                     ...internetOffers["Mois"]!,
-                  ];
+                  ].map((offer) => _buildOfferCard(offer, context)));
                 } else if ((lowMinutes && lowInternet) ||
                     (lowMinutes && lowInternet && lowSms) ||
                     (lowInternet && lowSms) ||
                     (lowMinutes && lowSms)) {
-                  recommendedOffers = [
+                  offerWidgets.add(_buildCategoryTitle("Illimax"));
+                  offerWidgets.addAll([
                     ...illimaxOffers["Jour"]!,
                     ...illimaxOffers["Semaine"]!,
                     ...illimaxOffers["Mois"]!,
-                  ];
+                  ].map((offer) => _buildOfferCard(offer, context)));
                 }
 
-                if (recommendedOffers.isEmpty) {
+                if (offerWidgets.isEmpty) {
                   return const SizedBox.shrink();
                 }
 
-                return Column(
-                  children: recommendedOffers
-                      .map((offer) => _buildOfferCard(offer, context))
-                      .toList(),
-                );
+                return Column(children: offerWidgets);
               },
             ),
 
@@ -190,6 +208,29 @@ class RecommendationPage extends StatelessWidget {
   }
 
   // ===== Widgets réutilisables =====
+
+  Widget _buildCategoryTitle(String title) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color.fromARGB(255, 205, 170, 124), width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+        color: const Color.fromARGB(255, 250, 231, 205).withOpacity(0.1), // léger fond beige
+      ),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Color.fromARGB(255, 0, 0, 0), // texte beige
+        ),
+      ),
+    );
+  }
+
+
+
   static Widget _buildStat(IconData icon, String value, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),

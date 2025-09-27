@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'homepage.dart'; // ajuste le nom si ton fichier s'appelle home_page.dart
+import 'homepage.dart'; 
+import 'changecodepage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -32,18 +36,33 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void _onValidate() {
-    if (_input.length == 6 && _input == "123456") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Code incorrect")),
-      );
-    }
+void _onValidate() async {
+  if (_input.length != 6) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Code incomplet")),
+    );
+    return;
   }
+
+  final prefs = await SharedPreferences.getInstance();
+  final storedPin = prefs.getString('userPin') ?? "123456"; // valeur par défaut
+
+  if (_input == storedPin) {
+    // 🔹 Sauvegarde que l'utilisateur est connecté
+    await prefs.setBool('isLoggedIn', true);
+
+    // 🔹 Redirige vers HomePage
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomePage()),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Code incorrect")),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +165,12 @@ class _LoginPageState extends State<LoginPage> {
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const ChangeCodePage()),
+                                );
+                              },
                               child: const Text(
                                 "Code oublié ?",
                                 style: TextStyle(color: Colors.white),
@@ -185,20 +209,25 @@ class _LoginPageState extends State<LoginPage> {
 
             const SizedBox(height: 16),
 
-            // Lien inscription
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Pas encore inscrit? "),
-                GestureDetector(
-                  onTap: () {},
-                  child: const Text(
-                    "Crée ton compte",
-                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
+            // // Lien inscription
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     const Text("Pas encore inscrit? "),
+            //     GestureDetector(
+            //       onTap: () {
+            //           Navigator.push(
+            //             context,
+            //             MaterialPageRoute(builder: (_) => const SignUpPage()),
+            //           );
+            //         },
+            //       child: const Text(
+            //         "Crée ton compte",
+            //         style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+            //       ),
+            //     ),
+            //   ],
+            // ),
 
             const SizedBox(height: 24),
           ],

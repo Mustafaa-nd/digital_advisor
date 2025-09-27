@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
+
 
 class CreditProvider extends ChangeNotifier {
   int _credit = 0;
@@ -11,6 +13,54 @@ class CreditProvider extends ChangeNotifier {
 
   // Historique sous forme de liste de Map
   final List<Map<String, dynamic>> _history = [];
+
+  // ====== Constructeur pour initialiser l'historique par défaut ======
+  CreditProvider() {
+    _history.addAll([
+      {
+        "title": "Mame Tabara",
+        "subtitle": "Transfert effectué",
+        "amount": "+50 000 CFA",
+        "positive": true,
+        "date": "25/09/2025 à 20:00",
+      },
+      {
+        "title": "Ibrahima NDIAYE",
+        "subtitle": "Achat de pass illimax",
+        "amount": "-3000 CFA",
+        "positive": false,
+        "date": "20/09/2025 à 20:00",
+      },
+      {
+        "title": "Father ❤️",
+        "subtitle": "Achat de pass illimax",
+        "amount": "-3000 CFA",
+        "positive": false,
+        "date": "20/09/2025 à 20:00",
+      },
+      {
+        "title": "Recharge de crédit",
+        "subtitle": "Recharge effectuée",
+        "amount": "+3000 CFA",
+        "positive": true,
+        "date": "17/09/2025 à 20:00",
+      },
+      {
+        "title": "Recharge de crédit",
+        "subtitle": "Recharge effectuée",
+        "amount": "+5000 CFA",
+        "positive": true,
+        "date": "17/09/2025 à 20:00",
+      },
+      {
+        "title": "Recharge de crédit",
+        "subtitle": "Recharge effectuée",
+        "amount": "+5000 CFA",
+        "positive": true,
+        "date": "17/09/2025 à 20:00",
+      },
+    ]);
+  }
 
   // ====== Getters ======
   int get credit => _credit;
@@ -88,16 +138,16 @@ class CreditProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Déduction de ressources lors d’un achat d’offre
+  
+
   void useResources({int minutes = 0, double internet = 0.0, int sms = 0}) {
     if (_minutes >= minutes) _minutes -= minutes;
     if (_internet >= internet) _internet -= internet;
     if (_sms >= sms) _sms -= sms;
 
-    // Historique
     _history.insert(0, {
-      "title": "Consommation de ressources",
-      "subtitle": "Offre utilisée",
+      "title": "Consommation",
+      "subtitle": "Ressources utilisées",
       "amount":
           "-${minutes} MIN, -${internet.toStringAsFixed(2)} GO, -${sms} SMS",
       "positive": false,
@@ -105,6 +155,24 @@ class CreditProvider extends ChangeNotifier {
     });
 
     notifyListeners();
+  }
+
+  // ====== Simulation aléatoire ======
+  void simulateConsumption() {
+    final random = Random();
+
+    int usedMinutes = random.nextInt(16);       // entre 0 et 15 min
+    double usedInternet = random.nextDouble() * 1.2; // entre 0.0 et 1.2 Go
+    int usedSms = random.nextInt(20);            // entre 0 et 20 SMS
+
+    // Vérifie qu’on a bien assez de ressources avant de consommer
+    if (_minutes > 0 || _internet > 0 || _sms > 0) {
+      useResources(
+        minutes: usedMinutes <= _minutes ? usedMinutes : _minutes,
+        internet: usedInternet <= _internet ? usedInternet : _internet,
+        sms: usedSms <= _sms ? usedSms : _sms,
+      );
+    }
   }
 
   // ====== Visibilité ======

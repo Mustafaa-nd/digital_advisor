@@ -5,9 +5,37 @@ import 'recommendationpage.dart';
 import 'rechargepage.dart';
 import 'transfertpage.dart';
 import 'offrespage.dart';
+import 'historiquepage.dart';
+import 'dart:async';
+import 'loginpage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Simulation toutes les 3 minutes
+    _timer = Timer.periodic(const Duration(minutes: 3), (timer) {
+      final provider = context.read<CreditProvider>();
+      provider.simulateConsumption(); 
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Nettoyage du timer quand la page est détruite
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +53,28 @@ class HomePage extends StatelessWidget {
           ],
         ),
         actions: [
-          IconButton(
+          PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
+            onSelected: (value) async {
+              if (value == 'logout') {
+                // 🔹 Déconnexion
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('isLoggedIn', false);
+
+                // 🔹 Retour à LoginPage
+                if (!mounted) return;
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('Déconnexion'),
+              ),
+            ],
           ),
         ],
       ),
@@ -35,12 +82,8 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Carte principale (crédit)
             _buildCreditCard(),
-
             const SizedBox(height: 16),
-
-            // Bouton Recommandation
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
@@ -56,10 +99,7 @@ class HomePage extends StatelessWidget {
               child: const Text("Mon conseiller",
                   style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
-
             const SizedBox(height: 20),
-
-            // Icônes
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -83,10 +123,7 @@ class HomePage extends StatelessWidget {
                 }),
               ],
             ),
-
             const SizedBox(height: 20),
-
-            // Historique dynamique
             _buildHistoryList(),
           ],
         ),
@@ -221,67 +258,113 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryList() {
-    return Consumer<CreditProvider>(
-      builder: (context, creditProvider, child) {
-        final history = creditProvider.history;
+Widget _buildHistoryList() {
+  return Consumer<CreditProvider>(
+    builder: (context, creditProvider, child) {
+      final history = creditProvider.history;
 
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text("Historique", style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text("Voir tout", style: TextStyle(color: Colors.blue)),
-                ],
-              ),
-              const Divider(),
+      // Limite à 4 dernières transactions
+      final recentHistory = history.length > 4 ? history.sublist(0, 4) : history;
 
-              // Si pas d’historique
-              if (history.isEmpty)
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text("Aucune transaction pour le moment"),
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Historique",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
                   ),
                 ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HistoryPage()),
+                    );
+                  },
+                  child: const Text(
+                    "Voir tout",
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ),
+              ],
+            ),
+            const Divider(),
 
-              // Sinon on affiche la liste
-              for (var t in history)
-                Column(
-                  children: [
-                    ListTile(
-                      dense: true,
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(t["title"],
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(t["subtitle"]),
-                      trailing: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            t["amount"],
-                            style: TextStyle(
-                                color: t["positive"] ? Colors.green : Colors.red),
-                          ),
-                          Text(t["date"], style: const TextStyle(fontSize: 10)),
-                        ],
+            // Liste scrollable
+            SizedBox(
+              height: 300,
+              child: recentHistory.isEmpty
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text("Aucune transaction pour le moment"),
                       ),
+                    )
+                  : ListView.builder(
+                      itemCount: recentHistory.length,
+                      itemBuilder: (context, index) {
+                        final t = recentHistory[index];
+                        return Card(
+                          color: const Color.fromARGB(255, 243, 224, 200),
+                          elevation: 2,
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            title: Text(
+                              t["title"],
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            subtitle: Text(t["subtitle"]),
+                            trailing: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  t["amount"],
+                                  style: TextStyle(
+                                      color: t["positive"]
+                                          ? Colors.green
+                                          : Colors.red,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  t["date"],
+                                  style: const TextStyle(fontSize: 10),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    const Divider(),
-                  ],
-                )
-            ],
-          ),
-        );
-      },
-    );
-  }
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
 }

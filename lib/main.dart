@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import 'models/creditprovider.dart';
 import 'loginpage.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); //Nécessaire pour SharedPreferences
-
+void main() {
   runApp(
     ChangeNotifierProvider(
       create: (_) => CreditProvider(),
@@ -14,6 +12,7 @@ void main() async {
   );
 }
 
+// MyApp peut rester Stateless, plus besoin de Stateful ni d'observer le cycle de vie
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -25,6 +24,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Roboto',
       ),
+      // 🔹 Toujours démarrer sur LoginPage
       home: const LoginPage(),
     );
   }
