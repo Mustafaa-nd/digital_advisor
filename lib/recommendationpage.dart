@@ -7,7 +7,7 @@ import 'offrespage.dart';
 
 
 String getRecommendationMessage(CreditProvider creditProvider) {
-  final lowMinutes = creditProvider.minutes < 100;
+  final lowMinutes = creditProvider.minutes < 40;
   final lowInternet = creditProvider.internet < 1;
   final lowSms = creditProvider.sms < 30;
 
@@ -141,7 +141,7 @@ class RecommendationPage extends StatelessWidget {
                     _buildStat(
                       Icons.phone,
                       "${creditProvider.minutes} MIN",
-                      creditProvider.minutes < 100
+                      creditProvider.minutes < 40
                           ? (themeProvider.isDark ? Colors.red.shade200 : Colors.red)
                           : theme.textTheme.bodyLarge?.color ?? Colors.black,
                       theme,
@@ -157,7 +157,7 @@ class RecommendationPage extends StatelessWidget {
                     _buildStat(
                       Icons.message,
                       "${creditProvider.sms} SMS",
-                      creditProvider.sms < 50
+                      creditProvider.sms < 30
                           ? (themeProvider.isDark ? Colors.red.shade200 : Colors.red)
                           : theme.textTheme.bodyLarge?.color ?? Colors.black,
                       theme,
@@ -172,9 +172,9 @@ class RecommendationPage extends StatelessWidget {
             // Offres recommandées dynamiques avec possibilité d'achat
             Consumer<CreditProvider>(
               builder: (context, creditProvider, child) {
-                final lowMinutes = creditProvider.minutes < 100;
+                final lowMinutes = creditProvider.minutes < 40;
                 final lowInternet = creditProvider.internet < 1;
-                final lowSms = creditProvider.sms < 50;
+                final lowSms = creditProvider.sms < 30;
 
                 // Offres finales à afficher
                 List<Widget> offerWidgets = [];

@@ -223,7 +223,7 @@ class _HomePageState extends State<HomePage> {
                   _buildResource(
                     "Minutes d'appel",
                     "${creditProvider.minutes} MIN",
-                    creditProvider.minutes < 100
+                    creditProvider.minutes < 40
                         ? Colors.red
                         : Theme.of(context).primaryColor,
                   ),
@@ -237,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                   _buildResource(
                     "SMS",
                     "${creditProvider.sms} SMS",
-                    creditProvider.sms < 50
+                    creditProvider.sms < 30
                         ? Colors.red
                         : Theme.of(context).primaryColor,
                   ),
