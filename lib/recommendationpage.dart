@@ -6,6 +6,40 @@ import 'models/themeprovider.dart';
 import 'offrespage.dart';
 
 
+String getRecommendationMessage(CreditProvider creditProvider) {
+  final lowMinutes = creditProvider.minutes < 100;
+  final lowInternet = creditProvider.internet < 1;
+  final lowSms = creditProvider.sms < 30;
+
+  if (!lowMinutes && !lowInternet && !lowSms) {
+    return "Tes ressources sont suffisantes, profites-en ! Voici tes niveaux actuels :";
+  }
+
+  if (lowMinutes && !lowInternet && !lowSms) {
+    return "Attention, tes minutes sont faibles. Pourquoi ne pas recharger rapidement ?\nVoici les offres adaptées à ton usage !";
+  }
+
+  if (!lowInternet && !lowMinutes && lowSms) {
+    return "Bon ton nombre de sms est faible. \nTu peux acheter parmi les illimax, ou si tu préfères tu peux ne pas les recharger !";
+  }
+
+  if (lowInternet && !lowMinutes && !lowSms) {
+    return "Ton Internet est faible. Voici les offres adaptées à ton usage !";
+  }
+
+  if ((lowMinutes && lowInternet) && !lowSms) {
+    return "Tes minutes et ton Internet sont faibles. Il est temps de les recharger.\nVoici les offres adaptées à ton usage !";
+  }
+
+  if (((lowMinutes && lowSms) && !lowInternet) || ((lowInternet && lowSms) && !lowMinutes)) {
+    return "Tes ressources sont faibles. Mieux vaut les recharger. \nVoici les offres qui t'iraient le mieux !";
+  }
+
+  return "Voici tes niveaux actuels :";
+}
+
+
+
 class RecommendationPage extends StatelessWidget {
   const RecommendationPage({super.key});
 
@@ -63,18 +97,7 @@ class RecommendationPage extends StatelessWidget {
             // Message dynamique
             Consumer<CreditProvider>(
               builder: (context, creditProvider, child) {
-                final lowMinutes = creditProvider.minutes < 100;
-                final lowInternet = creditProvider.internet < 1;
-                final lowSms = creditProvider.sms < 30;
-
-                String message;
-                if (!lowMinutes && !lowInternet && !lowSms) {
-                  message =
-                      "Tes ressources sont suffisantes, profites en ! Voici tes niveaux actuels:";
-                } else {
-                  message =
-                      "Tes ressources sont insuffisantes. Voici tes niveaux actuels:";
-                }
+                final message = getRecommendationMessage(creditProvider);
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +105,9 @@ class RecommendationPage extends StatelessWidget {
                     Text.rich(
                       TextSpan(
                         text: "Salut Mouhamadou, bienvenu chez ton conseiller ",
-                        style: TextStyle(fontSize: 14, color: theme.textTheme.bodyMedium?.color),
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: theme.textTheme.bodyMedium?.color),
                         children: [
                           TextSpan(
                             text: "Optimus.",
@@ -96,12 +121,15 @@ class RecommendationPage extends StatelessWidget {
                     const SizedBox(height: 10),
                     Text(
                       message,
-                      style: TextStyle(fontSize: 14, color: theme.textTheme.bodyMedium?.color),
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: theme.textTheme.bodyMedium?.color),
                     ),
                   ],
                 );
               },
-            ),
+            )
+,
             const SizedBox(height: 20),
 
             // Stats dynamiques
@@ -175,6 +203,13 @@ class RecommendationPage extends StatelessWidget {
                     ...appelOffers["Jour"]!,
                     ...appelOffers["Semaine"]!,
                     ...appelOffers["Mois"]!,
+                  ].map((offer) => _buildOfferCard(offer, context, theme)));
+                } else if (!lowInternet && !lowMinutes && lowSms) {
+                  offerWidgets.add(_buildCategoryTitle("Illimax", theme));
+                  offerWidgets.addAll([
+                    ...internetOffers["Jour"]!,
+                    ...internetOffers["Semaine"]!,
+                    ...internetOffers["Mois"]!,
                   ].map((offer) => _buildOfferCard(offer, context, theme)));
                 } else if (lowInternet && !lowMinutes && !lowSms) {
                   offerWidgets.add(_buildCategoryTitle("Internet", theme));
