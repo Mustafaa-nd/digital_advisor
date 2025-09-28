@@ -51,7 +51,7 @@ class _OffresPageState extends State<OffresPage>
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "NEWO Digital Advisor",
+          "Offres Optimus",
           style: TextStyle(
               color: theme.appBarTheme.foregroundColor ?? Colors.black,
               fontWeight: FontWeight.bold),

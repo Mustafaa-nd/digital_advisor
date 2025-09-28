@@ -74,7 +74,7 @@ class _TransfertPageState extends State<TransfertPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "NEWO Digital Advisor",
+          "Transfert Optimus",
           style: TextStyle(
               fontWeight: FontWeight.bold,
               color: theme.appBarTheme.foregroundColor ?? Colors.black),

@@ -46,7 +46,13 @@ class _HistoryPageState extends State<HistoryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Historique"),
+        title: Text(
+          "Historique Optimus",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).appBarTheme.foregroundColor ?? Colors.black,
+          ),
+        ),
         backgroundColor: appBarColor,
         centerTitle: true,
         actions: [
@@ -172,7 +178,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                       t["amount"],
                                       style: TextStyle(
                                           color: t["positive"]
-                                              ? Colors.green
+                                              ? const Color.fromARGB(255, 75, 200, 155)
                                               : Colors.red,
                                           fontWeight: FontWeight.bold),
                                     ),

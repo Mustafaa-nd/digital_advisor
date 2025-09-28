@@ -334,7 +334,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: const Text(
                       "Voir tout",
-                      style: TextStyle(color: Color(0xFF00E676)),
+                      style: TextStyle(color: Color.fromARGB(255, 24, 176, 138)),
                     ),
                   ),
                 ],
@@ -391,7 +391,7 @@ class _HomePageState extends State<HomePage> {
                                     t["amount"],
                                     style: TextStyle(
                                         color: t["positive"]
-                                            ? const Color(0xFF00E676)
+                                            ? const Color.fromARGB(255, 73, 192, 148)
                                             : Colors.red,
                                         fontWeight: FontWeight.bold),
                                   ),

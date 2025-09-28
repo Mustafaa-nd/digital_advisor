@@ -25,7 +25,7 @@ class RecommendationPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "NEWO Digital Advisor",
+          "Optimus",
           style: TextStyle(
               fontWeight: FontWeight.bold,
               color: theme.appBarTheme.foregroundColor ?? Colors.black),
@@ -85,7 +85,7 @@ class RecommendationPage extends StatelessWidget {
                         style: TextStyle(fontSize: 14, color: theme.textTheme.bodyMedium?.color),
                         children: [
                           TextSpan(
-                            text: "NeWo.",
+                            text: "Optimus.",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: theme.primaryColor),

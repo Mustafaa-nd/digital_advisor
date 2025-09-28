@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'models/creditprovider.dart';
 import 'loginpage.dart';
 import 'models/themeprovider.dart';
+import 'models/apptheme.dart'; 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,47 +30,10 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Digital Advisor',
 
-          // ===== Light Theme =====
-          theme: ThemeData(
-            brightness: Brightness.light,
-            fontFamily: 'Roboto',
-            primaryColor: const Color.fromARGB(255, 24, 176, 138), // turquoise principal
-            scaffoldBackgroundColor: const Color.fromARGB(255, 248, 248, 248), // fond clair
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Color.fromARGB(255, 24, 176, 138),
-              foregroundColor: Colors.white,
-            ),
-            textTheme: const TextTheme(
-              bodyLarge: TextStyle(color: Color(0xFF212121)), // texte principal
-              bodyMedium: TextStyle(color: Color(0xFF616161)), // texte secondaire
-            ),
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 24, 176, 138), // bouton turquoise
-                foregroundColor: Colors.white,
-              ),
-            ),
-            cardColor: Colors.white,
-            iconTheme: const IconThemeData(color: Color(0xFF212121)),
-            dividerColor: const Color(0xFFBDBDBD),
-          ),
-
-          // ===== Dark Theme =====
-          darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            fontFamily: 'Roboto',
-            primaryColor: const Color.fromARGB(255, 24, 151, 119), // Turquoise sombre
-            scaffoldBackgroundColor: const Color.fromARGB(255, 62, 62, 62), // Fond sombre
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Color.fromARGB(255, 24, 176, 138),
-              foregroundColor: Colors.black,
-            ),
-          ),
-
-          // ===== Theme Mode =====
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
           themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
 
-          // ===== Page de démarrage =====
           home: const LoginPage(),
         );
       },

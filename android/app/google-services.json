@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "115828811307",
+    "project_id": "optimus-da",
+    "storage_bucket": "optimus-da.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:115828811307:android:a837fc5de3f6f5d57d2c6e",
+        "android_client_info": {
+          "package_name": "com.example.digital_advisor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCry2s6DdDS_gqUs3OefnvPHJUMwjjk-Mc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

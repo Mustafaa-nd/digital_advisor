@@ -70,7 +70,7 @@ class _RechargePageState extends State<RechargePage> {
               color: theme.appBarTheme.foregroundColor ?? Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text("NEWO Digital Advisor",
+        title: Text("Recharge Optimus",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: theme.appBarTheme.foregroundColor ?? Colors.black)),
