@@ -186,13 +186,13 @@ class _TransfertPageState extends State<TransfertPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildKeypadRow(["1", "2", "3"]),
-                _buildKeypadRow(["4", "5", "6"]),
-                _buildKeypadRow(["7", "8", "9"]),
+                _buildKeypadRow(["1", "2", "3"], theme),
+                _buildKeypadRow(["4", "5", "6"], theme),
+                _buildKeypadRow(["7", "8", "9"], theme),
                 Row(
                   children: [
                     const Spacer(),
-                    Expanded(child: _buildNumberButton("0")),
+                    Expanded(child: _buildNumberButton("0", theme)),
                     Expanded(
                       child: Align(
                         alignment: Alignment.centerRight,
@@ -220,17 +220,17 @@ class _TransfertPageState extends State<TransfertPage> {
     );
   }
 
-  Widget _buildKeypadRow(List<String> numbers) {
+  Widget _buildKeypadRow(List<String> numbers, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: numbers.map(_buildNumberButton).toList(),
+        children: numbers.map((n) => _buildNumberButton(n, theme)).toList(),
       ),
     );
   }
 
-  Widget _buildNumberButton(String number) {
+  Widget _buildNumberButton(String number, ThemeData theme) {
     return SizedBox(
       width: 72,
       height: 56,
@@ -245,10 +245,9 @@ class _TransfertPageState extends State<TransfertPage> {
             child: Text(
               number,
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: const Color.fromARGB(255, 255, 255, 255), 
-              ),
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: theme.textTheme.bodyLarge?.color),
             ),
           ),
         ),
