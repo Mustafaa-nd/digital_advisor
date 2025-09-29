@@ -177,8 +177,8 @@ class _TransfertPageState extends State<TransfertPage> {
 
           // Pavé numérique
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 80),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: theme.primaryColor.withOpacity(0.8),
               borderRadius: BorderRadius.circular(16),

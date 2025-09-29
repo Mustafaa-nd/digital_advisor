@@ -169,7 +169,7 @@ class _RechargePageState extends State<RechargePage> {
 
           // Pavé numérique
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 80),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: theme.primaryColor.withOpacity(0.9),
