@@ -28,7 +28,7 @@ class AppTheme {
   static final darkTheme = ThemeData(
     brightness: Brightness.dark,
     fontFamily: 'Roboto',
-    primaryColor: const Color.fromARGB(255, 24, 176, 138),
+    primaryColor: const Color.fromARGB(255, 24, 151, 119),
     scaffoldBackgroundColor: const Color.fromARGB(255, 62, 62, 62),
     appBarTheme: const AppBarTheme(
       backgroundColor: Color.fromARGB(255, 24, 176, 138),
