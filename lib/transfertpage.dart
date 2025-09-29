@@ -247,7 +247,7 @@ class _TransfertPageState extends State<TransfertPage> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Colors.black, 
+                color: const Color.fromARGB(255, 255, 255, 255), 
               ),
             ),
           ),
