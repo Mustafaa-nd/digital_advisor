@@ -20,8 +20,8 @@ class CreditProvider extends ChangeNotifier {
       {
         "title": "Mame Tabara",
         "subtitle": "Transfert effectué",
-        "amount": "+50 000 CFA",
-        "positive": true,
+        "amount": "-50 000 CFA",
+        "positive": false,
         "date": "25/09/2025 à 20:00",
       },
       {
