@@ -5,12 +5,11 @@
 Optimus est une application mobile développée avec Flutter qui aide les utilisateurs à gérer des opérations financières courantes (recharges, transferts), consulter des offres et obtenir des recommandations personnalisées. L'application propose un thème clair/sombre, une navigation simple et une structure modulaire pour faciliter les évolutions.
 
 ## Stack technique
-## Stack technique
 - <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg" alt="Flutter" width="20"/> Flutter (UI)
 - <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dart/dart-original.svg" alt="Dart" width="20"/> Dart (langage)
 - ⚙️ Provider (gestion d'état)
 - <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-original.svg" alt="Android" width="20"/> Android / Android Studio (IDE)
-- <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/gradle/gradle-plain.svg" alt="Gradle" width="20"/> Gradle (build Android)
+- <img src="assets/Gradle_logo.png" alt="Gradle" width="20"/> Gradle (build Android)
 - Android / iOS / Web via Flutter
 
 ## Fonctionnalités
@@ -118,25 +117,17 @@ Screenshot : Conseiller Optimus
 
 Screenshot : Recharge
 
-![Recharge](assets/Screenshot_Recharge.png)
+<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+	<img src="assets/Screenshot_Accueil.png" alt="Accueil" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
+	<img src="assets/Screenshot_Login.png" alt="Login" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
+	<img src="assets/Screenshot_Offres.png" alt="Offres" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
+	<img src="assets/Screenshot_Recharge.png" alt="Recharge" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
+	<img src="assets/Screenshot_Transfert.png" alt="Transfert" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
+	<img src="assets/Screenshot_Historique.png" alt="Historique" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
+	<img src="assets/Screenshot_ThemeSwitch.png" alt="Theme Switch" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
+	<img src="assets/Screenshot_CodeChange.png" alt="Code Change" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
+	<img src="assets/Screenshot_Conseiller.png" alt="Conseiller" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
+</div>
 
-Screenshot : Transfert
-
-![Transfert](assets/Screenshot_Transfert.png)
-
-Screenshot : Offres
-
-![Offres](assets/Screenshot_Offres.png)
-
-Screenshot : Historique
 
 ![Historique](assets/Screenshot_Historique.png)
-
-Screenshot : Theme Switch
-
-![ThemeSwitch](assets/Screenshot_ThemeSwitch.png)
-
-Screenshot : Code Change
-
-![Code Change](assets/Screenshot_CodeChange.png)
-
