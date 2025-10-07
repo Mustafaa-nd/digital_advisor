@@ -103,31 +103,14 @@ flutter build apk --release
 
 ## Captures d'écran
 
-Screenshot : Login
-
-![Login](assets/Screenshot_Login.png)
-
-Screenshot : Accueil
-
-![Accueil](assets/Screenshot_Accueil.png)
-
-Screenshot : Conseiller Optimus
-
-![Conseiller](assets/Screenshot_Conseiller.png)
-
-Screenshot : Recharge
-
 <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+    <img src="assets/Screenshot_Login.png" alt="Login" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
 	<img src="assets/Screenshot_Accueil.png" alt="Accueil" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
-	<img src="assets/Screenshot_Login.png" alt="Login" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
 	<img src="assets/Screenshot_Offres.png" alt="Offres" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
 	<img src="assets/Screenshot_Recharge.png" alt="Recharge" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
+    <img src="assets/Screenshot_Conseiller.png" alt="Conseiller" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
 	<img src="assets/Screenshot_Transfert.png" alt="Transfert" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
 	<img src="assets/Screenshot_Historique.png" alt="Historique" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
 	<img src="assets/Screenshot_ThemeSwitch.png" alt="Theme Switch" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
 	<img src="assets/Screenshot_CodeChange.png" alt="Code Change" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
-	<img src="assets/Screenshot_Conseiller.png" alt="Conseiller" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
 </div>
-
-
-![Historique](assets/Screenshot_Historique.png)
