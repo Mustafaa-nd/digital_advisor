@@ -116,4 +116,8 @@ flutter build apk --release
 </div>
 
 
-**MErci d'avoir pris le temps de lire jusqu'ici! \nVos Feedbacks et vos contributions seront très appréciés ! 👨🏾‍💻❤️**
+**Merci d'avoir pris le temps de lire jusqu'ici!**
+
+**Vos Feedbacks et vos contributions seront très appréciés ! 👨🏾‍💻❤️**
+
+**_Mustafaa_**
