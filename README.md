@@ -114,3 +114,6 @@ flutter build apk --release
 	<img src="assets/Screenshot_ThemeSwitch.png" alt="Theme Switch" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
 	<img src="assets/Screenshot_CodeChange.png" alt="Code Change" style="width:23%;min-width:160px;border:1px solid #ddd;padding:4px;" />
 </div>
+
+
+**Vos Feedbacks et vos contributions seront très appréciés ! 👨🏾‍💻❤️**
