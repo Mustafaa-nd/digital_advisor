@@ -9,7 +9,7 @@ Optimus est une application mobile développée avec Flutter qui aide les utilis
 - <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dart/dart-original.svg" alt="Dart" width="20"/> Dart (langage)
 - ⚙️ Provider (gestion d'état)
 - <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-original.svg" alt="Android" width="20"/> Android / Android Studio (IDE)
-- <img src="assets/Gradle_logo.png" alt="Gradle" width="20"/> Gradle (build Android)
+- <img src="assets/LogoGradle.png" alt="Gradle" width="20"/> Gradle (build Android)
 - Android / iOS / Web via Flutter
 
 ## Fonctionnalités
